@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gofiber/contrib/fiberzap/v2"
@@ -17,32 +18,32 @@ type Config struct {
 type Server struct {
 	config *Config
 	logger *zap.Logger
-	router *fiber.App
+	Router *fiber.App
 }
 
 func Init(config *Config, logger *zap.Logger) Server {
 	return Server{
 		config: config,
 		logger: logger,
-		router: fiber.New(),
+		Router: fiber.New(),
 	}
 }
 
-func (s *Server) regiserMiddleware() {
-	s.router.Use(fiberzap.New(fiberzap.Config{
+func (s *Server) registerMiddleware() {
+	s.Router.Use(fiberzap.New(fiberzap.Config{
 		Logger: s.logger,
 	}))
 }
 
 func (s *Server) registerRoutes() {
-	s.router.Get("/", func(c *fiber.Ctx) error {
+	s.Router.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
 }
 
 func (s *Server) Serve() {
-	s.regiserMiddleware()
+	s.registerMiddleware()
 	s.registerRoutes()
-	s.logger.Info("Starting HTTP server")
-	log.Fatal(s.router.Listen(":3000"))
+	s.logger.Info("Starting HTTP server at", zap.String("host", s.config.Host), zap.Int("port", s.config.Port))
+	log.Fatal(s.Router.Listen(fmt.Sprintf("%s:%d", s.config.Host, s.config.Port)))
 }

@@ -2,25 +2,28 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/gregmulvaney/forager/pkg/api/http"
+	"github.com/gregmulvaney/forager/pkg/plugins"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
-	"strings"
 )
 
 func main() {
 	// Enable flags
 	flagSet := pflag.NewFlagSet("default", pflag.ContinueOnError)
 	// Plugins config
-	flagSet.String("plugin-dir", "./plugins", "Plugin file directory")
+	flagSet.String("plugins-dir", "./plugins", "Plugin file directory")
 	// HTTP config
 	flagSet.String("host", "0.0.0.0", "HTTP service address")
 	flagSet.Int("port", 3080, "HTTP plaintext service port")
 	flagSet.Int("secure-port", 3443, "HTTP secure service port")
-	// TODO: Add log level configuration
+	// Log level
+	flagSet.String("log-level", "info", "Log level: debug, info, warn, error, fatal, or panic")
 
 	viper.BindPFlags(flagSet)
 
@@ -48,7 +51,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	logger, err := initZap()
+	logger, err := initZap(viper.GetString("log-level"))
 	defer logger.Sync()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s", err)
@@ -61,17 +64,58 @@ func main() {
 	if err := viper.Unmarshal(&httpConfig); err != nil {
 		panic(err)
 	}
+
 	httpServer := http.Init(httpConfig, logger)
+
+	var pluginConfig *plugins.Config
+	if err := viper.Unmarshal(&pluginConfig); err != nil {
+		panic(err)
+	}
+	plugins.Register(pluginConfig, httpServer.Router, logger)
 
 	httpServer.Serve()
 }
 
-func initZap() (*zap.Logger, error) {
-	config := zap.NewDevelopmentConfig()
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	logger, err := config.Build()
-	if err != nil {
-		return nil, err
+func initZap(logLevel string) (*zap.Logger, error) {
+	level := zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	switch logLevel {
+	case "debug":
+		level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	case "info":
+		level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	case "warn":
+		level = zap.NewAtomicLevelAt(zapcore.WarnLevel)
+	case "error":
+		level = zap.NewAtomicLevelAt(zapcore.ErrorLevel)
+	case "fatal":
+		level = zap.NewAtomicLevelAt(zapcore.FatalLevel)
+	case "panic":
+		level = zap.NewAtomicLevelAt(zapcore.PanicLevel)
 	}
-	return logger, nil
+
+	zapEncoderConfig := zapcore.EncoderConfig{
+		TimeKey:        "ts",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "msg",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+
+	config := zap.Config{
+		Level:            level,
+		Development:      false,
+		Encoding:         "console",
+		EncoderConfig:    zapEncoderConfig,
+		OutputPaths:      []string{"stderr"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+
+	return config.Build()
+
 }
