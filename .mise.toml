@@ -1,3 +1,0 @@
-[env]
-LOG_LEVEL = "debug"
-PLUGINS_DIR = "{{config_root}}/tmp/plugins"
