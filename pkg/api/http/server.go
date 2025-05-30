@@ -3,9 +3,13 @@ package http
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gofiber/contrib/fiberzap/v2"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"github.com/gregmulvaney/forager/web"
+	"github.com/gregmulvaney/forager/web/views"
 	"go.uber.org/zap"
 )
 
@@ -37,8 +41,11 @@ func (s *Server) registerMiddleware() {
 
 func (s *Server) registerRoutes() {
 	s.Router.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello World")
+		c.Set("Content-type", "text/html")
+		return views.Index().Render(c.Context(), c.Response().BodyWriter())
 	})
+
+	s.Router.Use("/static/*", adaptor.HTTPHandler(http.FileServer(http.FS(web.Static))))
 }
 
 func (s *Server) Serve() {

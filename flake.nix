@@ -27,11 +27,13 @@
           ];
 
           buildInputs = with pkgs; [
+            bun
             go
             gofumpt
             gopls
             gotools
             templ
+            typescript-language-server
           ];
         };
       }

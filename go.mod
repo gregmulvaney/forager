@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	github.com/a-h/templ v0.3.865 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
