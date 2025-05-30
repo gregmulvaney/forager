@@ -11,7 +11,6 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
     flake-utils,
     ...
@@ -20,10 +19,19 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
       in rec {
-        devShell = pkgs.mkShellNoCC {
+        devShell = pkgs.mkShell {
           name = "go";
+
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+          ];
+
           buildInputs = with pkgs; [
-            air
+            go
+            gofumpt
+            gopls
+            gotools
+            templ
           ];
         };
       }
