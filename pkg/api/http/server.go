@@ -45,6 +45,7 @@ func (s *Server) registerRoutes() {
 		return views.Index().Render(c.Context(), c.Response().BodyWriter())
 	})
 
+	// Load all static files
 	s.Router.Use("/static/*", adaptor.HTTPHandler(http.FileServer(http.FS(web.Static))))
 }
 

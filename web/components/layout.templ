@@ -5,6 +5,7 @@ templ Layout(title string) {
 		@head(title)
 		<body class="text-zinc-300">
 			<div class="min-h-dvh bg-secondary text-zinc-300 w-full">
+				@nav()
 				<main class="px-4">
 					{ children... }
 				</main>
