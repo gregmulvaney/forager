@@ -18,6 +18,7 @@
         buildInputs = with pkgs; [
           air
           bun
+          delve
           go
           gofumpt
           gopls

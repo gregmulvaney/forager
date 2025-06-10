@@ -1,0 +1,9 @@
+# Go output
+tmp
+bin
+
+# Nix output
+.direnv
+
+# Node outputs
+node_modules
