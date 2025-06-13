@@ -13,12 +13,14 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
       in {
-        name = "Forager";
+        devShell = pkgs.mkShell {
+          name = "Forager";
 
-        buildInputs = with pkgs; [
-          zig
-          zls
-        ];
+          buildInputs = with pkgs; [
+            zig
+            zls
+          ];
+        };
       }
     );
 }
