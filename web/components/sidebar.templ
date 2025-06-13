@@ -1,0 +1,98 @@
+package components
+
+type SidebarItem struct {
+	text string
+	icon string
+	href string
+}
+
+var items = []SidebarItem{
+	{
+		text: "Downloads",
+		icon: "download",
+		href: "/",
+	},
+}
+
+templ sidebar() {
+	<aside
+		x-data="{open:true}"
+		@keydown.meta.K.window="open = !open"
+		class="bg-secondary fixed top-0 left-0 bottom-0 transition-all duration-300 ease-in-out px-4"
+		:class="open ? 'w-58': 'w-18'"
+	>
+		// Title
+		<div class="title h-16 border-b border-border flex items-center">
+			<div class="flex flex-1">
+				<a href="/" class="items-center flex gap-2 flex-1">
+					<img src="/static/icon.png" alt="Forager" class="h-10 w-10"/>
+					<span
+						class="text-2xl font-medium tracking-wide transition-all transition-discrete duration-300 ease-in-out"
+						:class="open ? 'opacity-100' : 'opacity-0'"
+					>
+						Forager
+					</span>
+				</a>
+			</div>
+		</div>
+		// Nav items
+		<div class="pt-4 flex flex-col gap-1">
+			for _, item := range items {
+				<div class="w-full">
+					<a
+						href={ templ.URL(item.href) }
+						class="flex items-center p-2 rounded-lg hover:bg-border w-full text-sm"
+						:class="open ? 'gap-2 p-2' : 'px-3 py-2'"
+					>
+						<i class="h-4 w-4 text-md" data-lucide={ item.icon }></i>
+						<span
+							class="font-medium"
+							:class="open ? 'opacity-100 w-full':'opacity-0 w-0'"
+						>
+							{ item.text }
+						</span>
+					</a>
+				</div>
+			}
+		</div>
+	</aside>
+}
+
+//templ TemplateName() {
+//templ
+//templ}templ sidebar() {
+//templ	<aside :class="open ? 'w-56': 'w-18'" class="bg-secondary fixed top-0 left-0 bottom-0 transition-all duration-300 ease-in-out" x-data="{open: true}">
+//templ		<div class="title flex gap-1 items-center h-16 border-b border-border px-4">
+//templ			<img src="/static/icon.png" alt="" class="h-10 w-10"/>
+//templ			<span :class="open ? '' : 'hidden'" class="text-2xl font-medium tracking-wide transition-all duration-300 ease-in-out">Forager</span>
+//templ			<div class="justify-end items-center w-full flex">
+//templ				<button :class="open ? '': 'absolute bottom-4 left-5'" type="button" class="cursor-pointer flex items-center" @click="open = !open">
+//templ					<i data-lucide="panel-left" class="h-5 w-5"></i>
+//templ				</button>
+//templ			</div>
+//templ		</div>
+//templ		<div class="py-8 px-4">
+//templ			<ul class="flex flex-col gap-1">
+//templ				<li class="font-medium text-sm">
+//templ					<a href="/" class="flex gap-2 w-full items-center p-2 hover:bg-border rounded-lg" :class="open ? '' : 'justify-center'">
+//templ						<i class="h-4 w-4" data-lucide="download"></i>
+//templ						<span :class="open ? '' : 'hidden'">Downloads</span>
+//templ					</a>
+//templ				</li>
+//templ				<li class="font-medium text-sm">
+//templ					<a href="/" class="flex gap-2 items-center w-full hover:bg-border p-2 rounded-lg" :class="open ? '' : 'justify-center'">
+//templ						<i class="h-4 w-4" data-lucide="layout-panel-left"></i>
+//templ						<span :class="open ? '' : 'hidden'">Services</span>
+//templ					</a>
+//templ				</li>
+//templ			</ul>
+//templ		</div>
+//templ		<div :class="open ? '' : 'hidden'" class="absolute bottom-0 left-0 w-full px-4 py-4">
+//templ			<div class="flex items-center gap-4">
+//templ				<a href="https://github.com/gregmulvaney/forager">
+//templ					<i class="h-6 w-6" data-lucide="github"></i>
+//templ				</a>
+//templ			</div>
+//templ		</div>
+//	</aside>
+//}

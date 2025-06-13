@@ -1,0 +1,15 @@
+{
+  "name": "forager",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@olrtg/emmet-language-server": "^2.6.1",
+    "@tailwindcss/cli": "^4.1.8",
+    "@types/bun": "latest",
+    "tailwindcss": "^4.1.8"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

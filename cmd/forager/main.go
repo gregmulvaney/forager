@@ -31,7 +31,7 @@ func main() {
 	}
 
 	viper.Set("hostname", hostname)
-	// TODO: Pull the version from a centralized location
+	// TODO: Pull the version number from a centralized location
 	viper.Set("version", "0.0.1")
 
 	versionFlag := flagSet.BoolP("version", "v", false, "Print service version")
@@ -56,18 +56,20 @@ func main() {
 	defer stdLog()
 
 	var httpConfig *http.Config
-	if err := viper.Unmarshal(httpConfig); err != nil {
+	if err := viper.Unmarshal(&httpConfig); err != nil {
 		panic(err)
 	}
 
 	// Initialize HTTP server struct
 	httpSrv, _ := http.Init(httpConfig, logger)
 
+	// Start HTTP server
 	httpSrv.Serve()
 }
 
 func initZap(logLevel string) (*zap.Logger, error) {
 	level := zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	// Switch log levels based on flags
 	switch logLevel {
 	case "debug":
 		level = zap.NewAtomicLevelAt(zapcore.DebugLevel)

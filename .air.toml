@@ -1,0 +1,29 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+pre_cmd = [
+    "make templ",
+]
+
+cmd = "go build -o bin/forager cmd/forager/main.go"
+bin = "bin/forager"
+include_ext = [
+    "go",
+    "templ",
+]
+exclude_dir = [
+    "tmp",
+    "bin",
+    "node_modules"
+]
+exclude_regex = [
+    "index.css",
+    "_test\\.go",
+    ".*_templ.go"
+]
+
+[proxy]
+enabled = true
+proxy_port = 3080
+app_port = 3000

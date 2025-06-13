@@ -1,0 +1,30 @@
+package components
+
+templ Layout(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		@head(title)
+		<body class="text-zinc-300">
+			<div class="min-h-dvh bg-background text-foreground w-full flex">
+				@sidebar()
+				<main class="px-4">
+					{ children... }
+				</main>
+			</div>
+			<script src="https://unpkg.com/lucide@latest"></script>
+			<script>
+                lucide.createIcons();
+            </script>
+		</body>
+	</html>
+}
+
+templ head(title string) {
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title }</title>
+		<link rel="stylesheet" href="/static/index.css"/>
+		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+	</head>
+}
