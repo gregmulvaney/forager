@@ -6,4 +6,7 @@ bin
 .direnv
 
 # Node outputs
-node_modules
+*node_modules
+
+# macOS junk
+*.DS_Store

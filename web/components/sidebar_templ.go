@@ -9,16 +9,24 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 type SidebarItem struct {
-	text string
-	icon string
-	href string
+	text        string
+	icon        string
+	href        string
+	collapsible bool
 }
 
 var items = []SidebarItem{
 	{
-		text: "Downloads",
-		icon: "download",
-		href: "/",
+		text:        "Downloads",
+		icon:        "download",
+		href:        "/",
+		collapsible: false,
+	},
+	{
+		text:        "Services",
+		icon:        "panel-left",
+		href:        "services",
+		collapsible: true,
 	},
 }
 
@@ -43,7 +51,7 @@ func sidebar() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<aside x-data=\"{open:true}\" @keydown.meta.K.window=\"open = !open\" class=\"bg-secondary fixed top-0 left-0 bottom-0 transition-all duration-300 ease-in-out px-4\" :class=\"open ? &#39;w-58&#39;: &#39;w-18&#39;\"><div class=\"title h-16 border-b border-border flex items-center\"><div class=\"flex flex-1\"><a href=\"/\" class=\"items-center flex gap-2 flex-1\"><img src=\"/static/icon.png\" alt=\"Forager\" class=\"h-10 w-10\"> <span class=\"text-2xl font-medium tracking-wide transition-all transition-discrete duration-300 ease-in-out\" :class=\"open ? &#39;opacity-100&#39; : &#39;opacity-0&#39;\">Forager</span></a></div></div><div class=\"pt-4 flex flex-col gap-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<aside x-data=\"{open: $persist(true)}\" @keydown.meta.K.window=\"open = !open\" class=\"bg-secondary fixed top-0 left-0 bottom-0 transition-all duration-300 ease-in-out px-4\" :class=\"open ? &#39;w-58&#39;: &#39;w-18&#39;\"><div class=\"title h-16 border-b border-border flex items-center\"><div class=\"flex flex-1\"><a href=\"/\" class=\"items-center flex gap-2 flex-1\"><img src=\"/static/icon.png\" alt=\"Forager\" class=\"h-10 w-10\"> <span class=\"text-2xl font-medium tracking-wide transition-all transition-discrete duration-300 ease-in-out\" :class=\"open ? &#39;opacity-100&#39; : &#39;opacity-0&#39;\">Forager</span></a></div></div><div class=\"pt-4 flex flex-col gap-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -57,38 +65,48 @@ func sidebar() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"flex items-center p-2 rounded-lg hover:bg-border w-full text-sm\" :class=\"open ? &#39;gap-2 p-2&#39; : &#39;px-3 py-2&#39;\"><i class=\"h-4 w-4 text-md\" data-lucide=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"flex items-center p-2 rounded-lg hover:bg-border w-full text-sm gap-2\" :class=\"open ? &#39;&#39; : &#39;justify-center&#39; \"><i class=\"h-4 w-4 text-md transition-all duration-300 ease-in-out\" data-lucide=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(item.icon)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/components/sidebar.templ`, Line: 47, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/components/sidebar.templ`, Line: 55, Col: 96}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"></i> <span class=\"font-medium\" :class=\"open ? &#39;opacity-100 w-full&#39;:&#39;opacity-0 w-0&#39;\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"></i> <span class=\"font-medium transition-all transition-discrete duration-300 ease-in-out\" :class=\"open ? &#39;opacity-100 block&#39;:&#39;opacity-0 hidden&#39;\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(item.text)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/components/sidebar.templ`, Line: 52, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/components/sidebar.templ`, Line: 60, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span></a></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if item.collapsible {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<i class=\"h-4 w-4 ml-auto\" data-lucide=\"chevron-right\" :class=\"open ? &#39;&#39;:&#39;hidden&#39;\"></i>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</a></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></aside>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></aside>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -96,43 +114,4 @@ func sidebar() templ.Component {
 	})
 }
 
-// templ TemplateName() {
-// templ
-// templ}templ sidebar() {
-// templ	<aside :class="open ? 'w-56': 'w-18'" class="bg-secondary fixed top-0 left-0 bottom-0 transition-all duration-300 ease-in-out" x-data="{open: true}">
-// templ		<div class="title flex gap-1 items-center h-16 border-b border-border px-4">
-// templ			<img src="/static/icon.png" alt="" class="h-10 w-10"/>
-// templ			<span :class="open ? ” : 'hidden'" class="text-2xl font-medium tracking-wide transition-all duration-300 ease-in-out">Forager</span>
-// templ			<div class="justify-end items-center w-full flex">
-// templ				<button :class="open ? ”: 'absolute bottom-4 left-5'" type="button" class="cursor-pointer flex items-center" @click="open = !open">
-// templ					<i data-lucide="panel-left" class="h-5 w-5"></i>
-// templ				</button>
-// templ			</div>
-// templ		</div>
-// templ		<div class="py-8 px-4">
-// templ			<ul class="flex flex-col gap-1">
-// templ				<li class="font-medium text-sm">
-// templ					<a href="/" class="flex gap-2 w-full items-center p-2 hover:bg-border rounded-lg" :class="open ? ” : 'justify-center'">
-// templ						<i class="h-4 w-4" data-lucide="download"></i>
-// templ						<span :class="open ? ” : 'hidden'">Downloads</span>
-// templ					</a>
-// templ				</li>
-// templ				<li class="font-medium text-sm">
-// templ					<a href="/" class="flex gap-2 items-center w-full hover:bg-border p-2 rounded-lg" :class="open ? ” : 'justify-center'">
-// templ						<i class="h-4 w-4" data-lucide="layout-panel-left"></i>
-// templ						<span :class="open ? ” : 'hidden'">Services</span>
-// templ					</a>
-// templ				</li>
-// templ			</ul>
-// templ		</div>
-// templ		<div :class="open ? ” : 'hidden'" class="absolute bottom-0 left-0 w-full px-4 py-4">
-// templ			<div class="flex items-center gap-4">
-// templ				<a href="https://github.com/gregmulvaney/forager">
-// templ					<i class="h-6 w-6" data-lucide="github"></i>
-// templ				</a>
-// templ			</div>
-// templ		</div>
-//
-//		</aside>
-//	}
 var _ = templruntime.GeneratedTemplate

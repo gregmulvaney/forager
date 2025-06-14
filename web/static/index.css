@@ -173,9 +173,6 @@
   }
 }
 @layer utilities {
-  .absolute {
-    position: absolute;
-  }
   .fixed {
     position: fixed;
   }
@@ -185,17 +182,17 @@
   .bottom-0 {
     bottom: calc(var(--spacing) * 0);
   }
-  .bottom-4 {
-    bottom: calc(var(--spacing) * 4);
-  }
   .left-0 {
     left: calc(var(--spacing) * 0);
   }
-  .left-5 {
-    left: calc(var(--spacing) * 5);
-  }
   .z-10 {
     z-index: 10;
+  }
+  .ml-auto {
+    margin-left: auto;
+  }
+  .block {
+    display: block;
   }
   .flex {
     display: flex;
@@ -205,9 +202,6 @@
   }
   .h-4 {
     height: calc(var(--spacing) * 4);
-  }
-  .h-5 {
-    height: calc(var(--spacing) * 5);
   }
   .h-6 {
     height: calc(var(--spacing) * 6);
@@ -221,14 +215,8 @@
   .min-h-dvh {
     min-height: 100dvh;
   }
-  .w-0 {
-    width: calc(var(--spacing) * 0);
-  }
   .w-4 {
     width: calc(var(--spacing) * 4);
-  }
-  .w-5 {
-    width: calc(var(--spacing) * 5);
   }
   .w-6 {
     width: calc(var(--spacing) * 6);
@@ -239,9 +227,6 @@
   .w-18 {
     width: calc(var(--spacing) * 18);
   }
-  .w-56 {
-    width: calc(var(--spacing) * 56);
-  }
   .w-58 {
     width: calc(var(--spacing) * 58);
   }
@@ -250,9 +235,6 @@
   }
   .flex-1 {
     flex: 1;
-  }
-  .cursor-pointer {
-    cursor: pointer;
   }
   .flex-col {
     flex-direction: column;
@@ -294,20 +276,8 @@
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
-  .px-3 {
-    padding-inline: calc(var(--spacing) * 3);
-  }
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);
-  }
-  .py-2 {
-    padding-block: calc(var(--spacing) * 2);
-  }
-  .py-4 {
-    padding-block: calc(var(--spacing) * 4);
-  }
-  .py-8 {
-    padding-block: calc(var(--spacing) * 8);
   }
   .pt-4 {
     padding-top: calc(var(--spacing) * 4);
