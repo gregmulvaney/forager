@@ -6,3 +6,7 @@ tailwind:
 
 templ:
 	templ generate && make tailwind
+
+build-plugin:
+	go build -buildmode=plugin -o tmp/plugins/example.so plugin-example/main.go
+

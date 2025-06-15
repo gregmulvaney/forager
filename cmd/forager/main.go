@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/gregmulvaney/forager/pkg/api/http"
+	"github.com/gregmulvaney/forager/pkg/plugins"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -33,6 +35,8 @@ func main() {
 	viper.Set("hostname", hostname)
 	// TODO: Pull the version number from a centralized location
 	viper.Set("version", "0.0.1")
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	viper.AutomaticEnv()
 
 	versionFlag := flagSet.BoolP("version", "v", false, "Print service version")
 
@@ -47,6 +51,7 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Initialize logger
 	logger, err := initZap(viper.GetString("log-level"))
 	defer logger.Sync()
 	if err != nil {
@@ -62,6 +67,18 @@ func main() {
 
 	// Initialize HTTP server struct
 	httpSrv, _ := http.Init(httpConfig, logger)
+
+	// Unmarshal plugin config
+	var pluginConfig *plugins.Config
+	if err := viper.Unmarshal(&pluginConfig); err != nil {
+		panic(err)
+	}
+
+	// Initialize plugins
+	err = plugins.Init(pluginConfig, &httpSrv, logger)
+	if err != nil {
+		panic(err)
+	}
 
 	// Start HTTP server
 	httpSrv.Serve()

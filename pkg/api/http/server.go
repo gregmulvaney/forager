@@ -12,9 +12,9 @@ import (
 )
 
 type Config struct {
-	Host       string
-	Port       int
-	SecurePort int
+	Host       string `mapstructure:"host"`
+	Port       int    `mapstructure:"port"`
+	SecurePort int    `mapstructure:"secure-port"`
 }
 
 type Server struct {
@@ -32,16 +32,16 @@ func Init(config *Config, logger *zap.Logger) (Server, error) {
 }
 
 func (s *Server) registerMiddlewares() {
+	// TODO
+}
+
+func (s *Server) registerRoutes() {
 	s.Router.Get("/", func(c *fiber.Ctx) error {
 		c.Set("Content-type", "text/html")
 		return views.Index().Render(c.Context(), c.Response().BodyWriter())
 	})
 
 	s.Router.Use("/static/*", adaptor.HTTPHandler(http.FileServer(http.FS(web.Static))))
-}
-
-func (s *Server) registerRoutes() {
-	// todo
 }
 
 func (s *Server) Serve() {
