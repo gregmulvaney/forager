@@ -1,0 +1,9 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespaces = true
+
+[Makefile]
+indent_style = tab

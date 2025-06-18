@@ -1,0 +1,13 @@
+# Go output
+tmp
+bin
+plugins
+
+# Nix output
+.direnv
+
+# Node outputs
+*node_modules
+
+# macOS junk
+*.DS_Store
