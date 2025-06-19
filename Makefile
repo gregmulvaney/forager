@@ -5,7 +5,7 @@ build-plugin:
 	go build -buildmode=plugin -o tmp/plugin/example.so ./plugin-example/main.go
 
 tailwind:
-	tailwindcss -o ./web/static/style.css -i ./tailwind.css
+	tailwindcss -o ./web/static/style.css -i ./tailwind.css --minify
 
 .PHONY: sqlc
 sqlc:

@@ -7,12 +7,10 @@ import (
 	_ "embed"
 
 	"github.com/gregmulvaney/forager/pkg/db/queries"
+	"github.com/gregmulvaney/forager/sqlc"
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
 )
-
-// go:embed ../../sqlc/queries.sql
-var ddl string
 
 type Db struct {
 	conn *sql.DB
@@ -26,14 +24,18 @@ func Init(logger *zap.Logger) *Db {
 		logger.Panic("Unable to open connection to database", zap.Error(err))
 	}
 
-	if _, err := dbConn.ExecContext(context.Background(), ddl); err != nil {
+	if _, err := dbConn.ExecContext(context.Background(), sqlc.DDL); err != nil {
 		logger.Panic("Failed to create schemas", zap.Error(err))
 	}
 
-	queries := queries.New(dbConn)
+	q := queries.New(dbConn)
+
+	if err != nil {
+		panic(err)
+	}
 
 	return &Db{
 		conn: dbConn,
-		q:    queries,
+		q:    q,
 	}
 }
