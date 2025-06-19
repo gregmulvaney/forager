@@ -22,6 +22,8 @@
             delve
             gopls
             templ
+            sqlc
+            tailwindcss_4
           ];
         };
       }

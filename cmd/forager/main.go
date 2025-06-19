@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gregmulvaney/forager/pkg/api/http"
+	"github.com/gregmulvaney/forager/pkg/db"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -60,6 +61,9 @@ func main() {
 	}
 	stdLog := zap.RedirectStdLog(logger)
 	defer stdLog()
+
+	// Initialize db
+	_ = db.Init(logger)
 
 	// Unmarshall http config
 	var httpConfig *http.Config
