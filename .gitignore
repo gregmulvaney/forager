@@ -1,7 +1,6 @@
 # Go output
 tmp
 bin
-plugins
 
 # Nix output
 .direnv
