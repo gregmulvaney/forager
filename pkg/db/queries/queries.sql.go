@@ -63,6 +63,17 @@ func (q *Queries) GetPlugin(ctx context.Context, id int64) (Plugin, error) {
 	return i, err
 }
 
+const getSchemaVersion = `-- name: GetSchemaVersion :one
+SELECT version FROM schema_version ORDER BY version DESC LIMIT 1
+`
+
+func (q *Queries) GetSchemaVersion(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getSchemaVersion)
+	var version int64
+	err := row.Scan(&version)
+	return version, err
+}
+
 const listPlugins = `-- name: ListPlugins :many
 SELECT id, name, path, created_at, updated_at FROM plugins
 ORDER BY name
@@ -95,6 +106,15 @@ func (q *Queries) ListPlugins(ctx context.Context) ([]Plugin, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const setSchemaVersion = `-- name: SetSchemaVersion :exec
+INSERT OR REPLACE INTO schema_version (version) VALUES (?)
+`
+
+func (q *Queries) SetSchemaVersion(ctx context.Context, version int64) error {
+	_, err := q.db.ExecContext(ctx, setSchemaVersion, version)
+	return err
 }
 
 const updatePlugin = `-- name: UpdatePlugin :one

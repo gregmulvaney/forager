@@ -1,3 +1,9 @@
+-- name: GetSchemaVersion :one
+SELECT version FROM schema_version ORDER BY version DESC LIMIT 1;
+
+-- name: SetSchemaVersion :exec
+INSERT OR REPLACE INTO schema_version (version) VALUES (?);
+
 -- name: CreatePlugin :one
 INSERT INTO plugins (
     name, path

@@ -1,3 +1,4 @@
-CREATE TABLE  plugins.example (
-    id INTEGER PRIMARY KEY
+CREATE TABLE  plugin_example_data (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
 );

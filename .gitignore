@@ -10,3 +10,6 @@ bin
 
 # macOS junk
 *.DS_Store
+
+# SQL
+forager.sqlite3

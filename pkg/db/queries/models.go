@@ -15,3 +15,8 @@ type Plugin struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type SchemaVersion struct {
+	Version   int64
+	AppliedAt time.Time
+}

@@ -25,6 +25,7 @@
             sqlc
             tailwindcss_4
           ];
+          PLUGINS_DIR = "./tmp/plugins";
         };
       }
     );

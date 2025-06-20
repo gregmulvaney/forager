@@ -5,8 +5,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gregmulvaney/forager"
 	"github.com/gregmulvaney/forager/pkg/api/http"
 	"github.com/gregmulvaney/forager/pkg/db"
+	"github.com/gregmulvaney/forager/pkg/plugins"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -25,6 +27,7 @@ func main() {
 	// fs.String("certificate", "yeet", "HTTP service certificate")
 	// Logs config
 	fs.String("log-level", "debug", "Log level: debug, info, warn, error, fatal, or panic")
+	fs.String("log-mode", "console", "Log mode: console (default) or json")
 
 	viper.BindPFlags(fs)
 
@@ -34,8 +37,7 @@ func main() {
 	}
 
 	viper.Set("hostname", hostname)
-	// TODO: Centralize the version number
-	viper.Set("version", "0.0.1")
+	viper.Set("version", forager.Version)
 	// Replace all dashes with underscores for environment variables
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	// Load environment variables
@@ -54,7 +56,7 @@ func main() {
 	}
 
 	// Initialize logger
-	logger, err := initZap(viper.GetString("log-level"))
+	logger, err := initZap(viper.GetString("log-level"), viper.GetString("log-mode"))
 	defer logger.Sync()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s", err)
@@ -63,7 +65,15 @@ func main() {
 	defer stdLog()
 
 	// Initialize db
-	_ = db.Init(logger)
+	dbConn := db.Init(logger)
+
+	// Unmarshal plugin config
+	var pluginConfig *plugins.Config
+	if err := viper.Unmarshal(&pluginConfig); err != nil {
+		logger.Panic("Failed to unmarshall plugin config", zap.Error(err))
+	}
+
+	plugins.RegisterPlugins(pluginConfig, dbConn, logger)
 
 	// Unmarshall http config
 	var httpConfig *http.Config
@@ -76,7 +86,7 @@ func main() {
 	httpServer.Serve()
 }
 
-func initZap(logLevel string) (*zap.Logger, error) {
+func initZap(logLevel string, logMode string) (*zap.Logger, error) {
 	level := zap.NewAtomicLevelAt(zapcore.InfoLevel)
 	// Switch log levels based on flags
 	switch logLevel {
@@ -111,7 +121,7 @@ func initZap(logLevel string) (*zap.Logger, error) {
 	config := zap.Config{
 		Level:            level,
 		Development:      false,
-		Encoding:         "console",
+		Encoding:         logMode,
 		EncoderConfig:    zapEncoderConfig,
 		OutputPaths:      []string{"stderr"},
 		ErrorOutputPaths: []string{"stderr"},

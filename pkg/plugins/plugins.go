@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -26,10 +27,13 @@ type PluginRegister struct {
 }
 
 type Service interface {
-	Register(*db.Db, *zap.Logger)
+	Register(*sql.DB, *zap.Logger)
 }
 
 func RegisterPlugins(config *Config, db *db.Db, logger *zap.Logger) {
+	logger.Debug("Loading plugins", zap.String("Directory", config.Directory))
+
+	// Walk plugins dir and register plugins
 	err := filepath.WalkDir(config.Directory, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -41,13 +45,29 @@ func RegisterPlugins(config *Config, db *db.Db, logger *zap.Logger) {
 				return err
 			}
 
+			name, err := lookupSymbol[string](symPlugin, "ServiceName")
+			if err != nil {
+				logger.Error("Failed plugin symbol lookup", zap.String("Path", path), zap.Error(err))
+				return nil
+			}
+
 			service, err := lookupSymbol[Service](symPlugin, "Service")
 			if err != nil {
 				logger.Panic("Failed symbol look up for plugin interface", zap.String("Plugin Path", path), zap.Error(err))
 				return nil
 			}
 
-			(*service).Register(db, logger)
+			(*service).Register(db.Conn, logger)
+
+			// TODO: make this cleaner
+			logger.Debug("Succesfully loaded plugin",
+				zap.String("Name", func() string {
+					if name != nil {
+						return *name
+					}
+					return "nil"
+				}()),
+			)
 		}
 		return nil
 	})
@@ -57,8 +77,8 @@ func RegisterPlugins(config *Config, db *db.Db, logger *zap.Logger) {
 	}
 }
 
-func lookupSymbol[T any](plugin *plugin.Plugin, name string) (*T, error) {
-	symbol, err := plugin.Lookup(name)
+func lookupSymbol[T any](plugin *plugin.Plugin, symbolName string) (*T, error) {
+	symbol, err := plugin.Lookup(symbolName)
 	if err != nil {
 		return nil, err
 	}
