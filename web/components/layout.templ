@@ -1,0 +1,28 @@
+package components
+
+templ Layout(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		@head(title)
+		<body class="bg-background text-foreground min-h-screen w-full" x-data="{sidebarOpen: true}">
+			<div class="flex w-full">
+				@nav()
+				<div class="flex-1 min-h-screen flex flex-col" :class="sidebarOpen ? 'pl-60':'pl-18'">
+					<main class="w-full flex-1 flex flex-col">
+						{ children... }
+					</main>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ head(title string) {
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title }</title>
+		<link rel="stylesheet" href="/static/style.css"/>
+		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+	</head>
+}

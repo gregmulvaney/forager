@@ -13,12 +13,13 @@ type service struct {
 	db *sql.DB
 }
 
-// go:embed queries.sql
+//go:embed schema.sql
 var DDL string
 
 func (s *service) Register(db *sql.DB, logger *zap.Logger) {
+	logger.Debug("Attemping to wrie schema to DB", zap.String("Plugin name", ServiceName))
 	if _, err := db.ExecContext(context.Background(), DDL); err != nil {
-		logger.Error("Failed to migrate schema", zap.Error(err))
+		logger.Info("Failed to migrate schema")
 	}
 
 	_ = queries.New(db)

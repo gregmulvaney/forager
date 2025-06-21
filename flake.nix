@@ -16,6 +16,8 @@
         devShell = pkgs.mkShell {
           name = "go";
           buildInputs = with pkgs; [
+            air
+            emmet-language-server
             go
             gofumpt
             gotools

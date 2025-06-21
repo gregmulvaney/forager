@@ -3,6 +3,9 @@ VERSION := $(shell cat VERSION)
 run:
 	go run cmd/forager/main.go
 
+dev:
+	air
+
 build:
 	go build -o bin/forager cmd/forager/main.go
 

@@ -1,10 +1,13 @@
 package plugins
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"plugin"
 
@@ -20,6 +23,7 @@ type ServicePlugin struct {
 	plugin *plugin.Plugin
 	name   string
 	path   string
+	hash   string
 }
 
 type PluginRegister struct {
@@ -28,6 +32,21 @@ type PluginRegister struct {
 
 type Service interface {
 	Register(*sql.DB, *zap.Logger)
+}
+
+func hashFile(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	hasher := sha256.New()
+	if _, err := io.Copy(hasher, file); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
 }
 
 func RegisterPlugins(config *Config, db *db.Db, logger *zap.Logger) {
@@ -40,6 +59,12 @@ func RegisterPlugins(config *Config, db *db.Db, logger *zap.Logger) {
 		}
 
 		if filepath.Ext(d.Name()) == ".so" {
+			hash, err := hashFile(path)
+			if err != nil {
+				logger.Error("Failed to hash plugin file", zap.String("Path", path), zap.Error(err))
+				return nil
+			}
+
 			symPlugin, err := plugin.Open(path)
 			if err != nil {
 				return err
@@ -60,13 +85,15 @@ func RegisterPlugins(config *Config, db *db.Db, logger *zap.Logger) {
 			(*service).Register(db.Conn, logger)
 
 			// TODO: make this cleaner
-			logger.Debug("Succesfully loaded plugin",
+			logger.Debug("Successfully loaded plugin",
 				zap.String("Name", func() string {
 					if name != nil {
 						return *name
 					}
 					return "nil"
 				}()),
+				zap.String("Path", path),
+				zap.String("Hash", hash),
 			)
 		}
 		return nil
