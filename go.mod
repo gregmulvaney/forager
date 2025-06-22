@@ -10,7 +10,6 @@ require (
 )
 
 require (
-	github.com/a-h/templ v0.3.898 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
