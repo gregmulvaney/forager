@@ -1,4 +1,4 @@
-CREATE TABLE plugins (
+CREATE TABLE IF NOT EXISTS plugins (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     path TEXT NOT NULL,

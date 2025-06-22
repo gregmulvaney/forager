@@ -1,7 +1,9 @@
 package plugins
 
 import (
+	"context"
 	"crypto/sha256"
+	"database/sql"
 	"fmt"
 	"io"
 	"io/fs"
@@ -10,6 +12,8 @@ import (
 	"plugin"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gregmulvaney/forager/pkg/db"
+	"github.com/gregmulvaney/forager/pkg/db/queries"
 	"go.uber.org/zap"
 )
 
@@ -26,17 +30,19 @@ type PluginRegister struct {
 	config  *Config
 	logger  *zap.Logger
 	router  *fiber.App
+	db      *db.Db
 	plugins []ServicePlugin
 }
 
 type Service interface {
-	Register()
+	Register(*sql.DB)
 }
 
-func Init(config *Config, logger *zap.Logger) *PluginRegister {
+func Init(config *Config, logger *zap.Logger, dbConn *db.Db) *PluginRegister {
 	return &PluginRegister{
 		config: config,
 		logger: logger,
+		db:     dbConn,
 	}
 }
 
@@ -48,17 +54,39 @@ func (p *PluginRegister) Register() {
 			return err
 		}
 		if filepath.Ext(d.Name()) == ".so" {
+			p.logger.Debug("Attempting to load plugin located at", zap.String("Path", path))
 			// Hash plugin file
-			_, err := hashPlugin(path)
+			hash, err := hashPlugin(path)
 			if err != nil {
 				p.logger.Panic("Failed to hash plugin file", zap.Error(err))
 			}
 
 			// Open the plugin
-			_, err = plugin.Open(path)
+			symPlugin, err := plugin.Open(path)
 			if err != nil {
 				p.logger.Panic("Failed to open plugin", zap.String("Plugin path", path), zap.Error(err))
 			}
+
+			// Lookup Service interface
+			service, err := lookupSymbol[Service](symPlugin, "Service")
+			if err != nil {
+				p.logger.Panic("Failed to lookup plugin service interface", zap.Error(err))
+			}
+
+			// Lookup plugin name
+			name, err := lookupSymbol[string](symPlugin, "ServiceName")
+			if err != nil {
+				p.logger.Panic("Faild to look up plugin name", zap.Error(err))
+			}
+
+			(*service).Register(p.db.Conn)
+
+			ctx := context.Background()
+
+			p.db.Q.CreatePlugin(ctx, queries.CreatePluginParams{
+				Name: fmt.Sprintf("%s", *name),
+				Hash: hash,
+			})
 
 		}
 

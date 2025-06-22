@@ -5,6 +5,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gregmulvaney/forager/pkg/api/http"
+	"github.com/gregmulvaney/forager/pkg/db"
+	"github.com/gregmulvaney/forager/pkg/plugins"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -61,6 +64,29 @@ func main() {
 	}
 	stdLog := zap.RedirectStdLog(logger)
 	defer stdLog()
+
+	// Intialize DB
+	dbConn := db.Init(logger)
+
+	// Unmarshall Plugin config
+	var pluginConfig *plugins.Config
+	if err := viper.Unmarshal(&pluginConfig); err != nil {
+		logger.Panic("Faile to unmarshall plugins config", zap.Error(err))
+	}
+
+	// Register plugins
+	pluginRegister := plugins.Init(pluginConfig, logger, dbConn)
+	pluginRegister.Register()
+
+	// Unmarshall HTTP config
+	var httpConfig *http.Config
+	if err := viper.Unmarshal(&httpConfig); err != nil {
+		logger.Panic("Failed to unmarshall HTTP config", zap.Error(err))
+	}
+
+	// Start HTTP servr
+	httpServer := http.Init(httpConfig, logger)
+	httpServer.ListenAndServe()
 }
 
 func initZap(logLevel string, logMode string) (*zap.Logger, error) {

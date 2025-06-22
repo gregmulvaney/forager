@@ -6,6 +6,7 @@ import (
 
 	"github.com/gregmulvaney/forager/pkg/db/queries"
 	"github.com/gregmulvaney/forager/sqlc"
+	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
 )
 
