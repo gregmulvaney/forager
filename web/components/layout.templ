@@ -1,5 +1,29 @@
 package components
 
+templ head(title string) {
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title }</title>
+		<link rel="stylesheet" href="/static/style.css"/>
+		<script src="https://unpkg.com/lucide@latest"></script>
+	</head>
+}
+
 templ Layout(title string) {
-	<div></div>
+	<!DOCTYPE html>
+	<html lang="en">
+		@head(title)
+		<body class="bg-background text-foreground w-full">
+			<div class="flex min-h-screen">
+				@sidebar()
+				<main class="ml-60">
+					{ children... }
+				</main>
+			</div>
+		</body>
+		<script>
+            lucide.createIcons()
+        </script>
+	</html>
 }

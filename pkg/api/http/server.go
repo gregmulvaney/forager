@@ -3,9 +3,11 @@ package http
 import (
 	"fmt"
 
+	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/gregmulvaney/forager/web"
+	"github.com/gregmulvaney/forager/web/pages"
 	"go.uber.org/zap"
 )
 
@@ -32,9 +34,21 @@ func Init(config *Config, logger *zap.Logger) *Server {
 
 func (s *Server) registerRoutes() {
 	// Route to all static files
-	s.Router.Use("/static", static.New("", static.Config{
+	s.Router.Use("/static", static.New("/", static.Config{
 		FS: web.Static,
 	}))
+
+	s.Router.Get("/", func(ctx fiber.Ctx) error {
+		return Render(ctx, pages.Index())
+	})
+
+	s.Router.Get("/settings", func(ctx fiber.Ctx) error {
+		return Render(ctx, pages.Settings())
+	})
+
+	s.Router.Get("/services", func(ctx fiber.Ctx) error {
+		return Render(ctx, pages.Services())
+	})
 }
 
 func (s *Server) registerMiddleware() {
@@ -48,4 +62,9 @@ func (s *Server) ListenAndServe() {
 	if err := s.Router.Listen(fmt.Sprintf("%s:%d", s.config.Host, s.config.Port)); err != nil {
 		s.logger.Panic("Failed to start HTTP service", zap.Error(err))
 	}
+}
+
+func Render(ctx fiber.Ctx, component templ.Component) error {
+	ctx.Set("Content-Type", "text/html")
+	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
 }
