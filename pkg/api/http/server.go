@@ -5,6 +5,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/compress"
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/gregmulvaney/forager/web"
 	"github.com/gregmulvaney/forager/web/pages"
@@ -53,6 +54,7 @@ func (s *Server) registerRoutes() {
 
 func (s *Server) registerMiddleware() {
 	// TODO
+	s.Router.Use(compress.New(compress.ConfigDefault))
 }
 
 func (s *Server) ListenAndServe() {

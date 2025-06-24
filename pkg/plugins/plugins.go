@@ -4,16 +4,22 @@ import (
 	"context"
 	"crypto/sha256"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"plugin"
+	"strings"
 
+	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gregmulvaney/forager/pkg/api/http"
 	"github.com/gregmulvaney/forager/pkg/db"
 	"github.com/gregmulvaney/forager/pkg/db/queries"
+	"github.com/gregmulvaney/forager/web/components"
+	"github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
 )
 
@@ -29,25 +35,51 @@ type ServicePlugin struct {
 type PluginRegister struct {
 	config  *Config
 	logger  *zap.Logger
-	router  *fiber.App
 	db      *db.Db
+	router  *fiber.App
 	plugins []ServicePlugin
 }
 
-type Service interface {
-	Register(*sql.DB)
+type layoutRenderer struct{}
+
+func (l *layoutRenderer) RenderWithLayout(title, content string) ([]byte, error) {
+	contentComponent := templ.Raw(content)
+	layoutComponent := components.Layout(title)
+
+	var buf []byte
+	ctx := context.Background()
+
+	// Create a new context with the content as children
+	ctx = templ.WithChildren(ctx, contentComponent)
+
+	// Render the layout with the content
+	buffer := &strings.Builder{}
+	err := layoutComponent.Render(ctx, buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	buf = []byte(buffer.String())
+	return buf, nil
 }
 
-func Init(config *Config, logger *zap.Logger, dbConn *db.Db) *PluginRegister {
+type Service interface {
+	Register(*sql.DB, fiber.Router, *zap.Logger, layoutRenderer)
+}
+
+func Init(config *Config, logger *zap.Logger, dbConn *db.Db, http *http.Server) *PluginRegister {
 	return &PluginRegister{
 		config: config,
 		logger: logger,
 		db:     dbConn,
+		router: http.Router,
 	}
 }
 
 func (p *PluginRegister) Register() {
 	p.logger.Debug("Loading plugins", zap.String("Directory", p.config.Directory))
+
+	serviceRouteGroup := p.router.Group("/service")
 
 	err := filepath.WalkDir(p.config.Directory, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -79,14 +111,32 @@ func (p *PluginRegister) Register() {
 				p.logger.Panic("Faild to look up plugin name", zap.Error(err))
 			}
 
-			(*service).Register(p.db.Conn)
+			// Lookup default url
+			homePath, err := lookupSymbol[string](symPlugin, "ServiceDefaultPath")
+			if err != nil {
+				p.logger.Panic("Failed to look up plugin default url")
+			}
+
+			var renderer layoutRenderer
+			(*service).Register(p.db.Conn, serviceRouteGroup, p.logger, renderer)
 
 			ctx := context.Background()
 
-			p.db.Q.CreatePlugin(ctx, queries.CreatePluginParams{
-				Name: fmt.Sprintf("%s", *name),
-				Hash: hash,
+			_, err = p.db.Q.CreatePlugin(ctx, queries.CreatePluginParams{
+				Name:     fmt.Sprintf("%s", *name),
+				Path:     path,
+				Hash:     hash,
+				HomePath: fmt.Sprintf("%s", *homePath),
 			})
+
+			if err != nil {
+				var sqliteErr sqlite3.Error
+				if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+					p.logger.Debug("Plugin already exists in database", zap.String("plugin", *name), zap.String("path", path))
+				} else {
+					p.logger.Debug("Failed to insert plugin data", zap.Error(err))
+				}
+			}
 
 		}
 

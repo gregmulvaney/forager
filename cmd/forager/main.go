@@ -68,16 +68,6 @@ func main() {
 	// Intialize DB
 	dbConn := db.Init(logger)
 
-	// Unmarshall Plugin config
-	var pluginConfig *plugins.Config
-	if err := viper.Unmarshal(&pluginConfig); err != nil {
-		logger.Panic("Faile to unmarshall plugins config", zap.Error(err))
-	}
-
-	// Register plugins
-	pluginRegister := plugins.Init(pluginConfig, logger, dbConn)
-	pluginRegister.Register()
-
 	// Unmarshall HTTP config
 	var httpConfig *http.Config
 	if err := viper.Unmarshal(&httpConfig); err != nil {
@@ -86,6 +76,17 @@ func main() {
 
 	// Start HTTP servr
 	httpServer := http.Init(httpConfig, logger)
+
+	// Unmarshall Plugin config
+	var pluginConfig *plugins.Config
+	if err := viper.Unmarshal(&pluginConfig); err != nil {
+		logger.Panic("Faile to unmarshall plugins config", zap.Error(err))
+	}
+
+	// Register plugins
+	pluginRegister := plugins.Init(pluginConfig, logger, dbConn, httpServer)
+	pluginRegister.Register()
+
 	httpServer.ListenAndServe()
 }
 

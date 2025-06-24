@@ -1,7 +1,7 @@
 -- name: CreatePlugin :one
 INSERT INTO plugins (
-    name, path, hash
-) VALUES (?, ?, ?)
+    name, path, hash, home_path
+) VALUES (?, ?, ?, ?)
 RETURNING *;
 
 -- name: GetPlugin :one

@@ -13,6 +13,7 @@ type Plugin struct {
 	Name      string
 	Path      string
 	Hash      string
+	HomePath  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

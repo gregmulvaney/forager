@@ -12,25 +12,32 @@ import (
 
 const createPlugin = `-- name: CreatePlugin :one
 INSERT INTO plugins (
-    name, path, hash
-) VALUES (?, ?, ?)
-RETURNING id, name, path, hash, created_at, updated_at
+    name, path, hash, home_path
+) VALUES (?, ?, ?, ?)
+RETURNING id, name, path, hash, home_path, created_at, updated_at
 `
 
 type CreatePluginParams struct {
-	Name string
-	Path string
-	Hash string
+	Name     string
+	Path     string
+	Hash     string
+	HomePath string
 }
 
 func (q *Queries) CreatePlugin(ctx context.Context, arg CreatePluginParams) (Plugin, error) {
-	row := q.db.QueryRowContext(ctx, createPlugin, arg.Name, arg.Path, arg.Hash)
+	row := q.db.QueryRowContext(ctx, createPlugin,
+		arg.Name,
+		arg.Path,
+		arg.Hash,
+		arg.HomePath,
+	)
 	var i Plugin
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Path,
 		&i.Hash,
+		&i.HomePath,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -48,7 +55,7 @@ func (q *Queries) DeletePlugin(ctx context.Context, id int64) error {
 }
 
 const getPlugin = `-- name: GetPlugin :one
-SELECT id, name, path, hash, created_at, updated_at FROM plugins
+SELECT id, name, path, hash, home_path, created_at, updated_at FROM plugins
 WHERE id = ? LIMIT 1
 `
 
@@ -60,6 +67,7 @@ func (q *Queries) GetPlugin(ctx context.Context, id int64) (Plugin, error) {
 		&i.Name,
 		&i.Path,
 		&i.Hash,
+		&i.HomePath,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -67,7 +75,7 @@ func (q *Queries) GetPlugin(ctx context.Context, id int64) (Plugin, error) {
 }
 
 const listPlugins = `-- name: ListPlugins :many
-SELECT id, name, path, hash, created_at, updated_at FROM plugins
+SELECT id, name, path, hash, home_path, created_at, updated_at FROM plugins
 ORDER BY name
 `
 
@@ -85,6 +93,7 @@ func (q *Queries) ListPlugins(ctx context.Context) ([]Plugin, error) {
 			&i.Name,
 			&i.Path,
 			&i.Hash,
+			&i.HomePath,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -105,7 +114,7 @@ const updatePlugin = `-- name: UpdatePlugin :one
 UPDATE plugins
 SET name = ?, path = ?, hash = ?, updated_at = ?
 WHERE id = ?
-RETURNING id, name, path, hash, created_at, updated_at
+RETURNING id, name, path, hash, home_path, created_at, updated_at
 `
 
 type UpdatePluginParams struct {
@@ -130,6 +139,7 @@ func (q *Queries) UpdatePlugin(ctx context.Context, arg UpdatePluginParams) (Plu
 		&i.Name,
 		&i.Path,
 		&i.Hash,
+		&i.HomePath,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

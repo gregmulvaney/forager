@@ -3,8 +3,9 @@ CREATE TABLE IF NOT EXISTS plugins (
     name TEXT NOT NULL UNIQUE,
     path TEXT NOT NULL,
     hash TEXT NOT NULL,
+    home_path TEXT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_plugins_hash ON plugins(hash);
+CREATE INDEX IF NOT EXISTS idx_plugins_hash ON plugins(hash);

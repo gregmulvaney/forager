@@ -1,4 +1,5 @@
-@import 'tailwindcss' source('./web/');
+@import 'tailwindcss';
+@source "web/";
 
 @theme {
     --color-secondary: oklch(0.2011 0.0039 286.04);

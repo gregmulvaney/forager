@@ -7,6 +7,7 @@ templ head(title string) {
 		<title>{ title }</title>
 		<link rel="stylesheet" href="/static/style.css"/>
 		<script src="https://unpkg.com/lucide@latest"></script>
+		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 	</head>
 }
 
@@ -15,7 +16,7 @@ templ Layout(title string) {
 	<html lang="en">
 		@head(title)
 		<body class="bg-background text-foreground w-full">
-			<div class="flex min-h-screen">
+			<div class="flex min-h-screen" x-data="{sidebarOpen: true}">
 				@sidebar()
 				<main class="ml-60">
 					{ children... }
