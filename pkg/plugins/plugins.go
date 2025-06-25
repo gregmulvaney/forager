@@ -67,7 +67,8 @@ func (p *PluginRegister) RegisterPlugins() {
 
 	serverAPI := &ServerAPI{
 		db:         p.db,
-		routeGroup: p.router.Group("/service"),
+		logger:     p.logger,
+		routeGroup: p.router.Group("/services"),
 	}
 
 	err := filepath.WalkDir(p.config.Directory, func(path string, d fs.DirEntry, err error) error {
@@ -76,28 +77,7 @@ func (p *PluginRegister) RegisterPlugins() {
 		}
 
 		if filepath.Ext(d.Name()) == ".so" {
-			p.logger.Debug("Attempting to load plugin at", zap.String("Path", path))
-
-			// Hash plugin file
-			_, err := hashPlugin(path)
-			if err != nil {
-				p.logger.Error("Failed to hash plugin file", zap.String("Path", path), zap.Error(err))
-			}
-
-			// Open plugin file
-			symPlugin, err := plugin.Open(path)
-			if err != nil {
-				p.logger.Error("Failed to open plugin file", zap.String("Path", path), zap.Error(err))
-			}
-
-			symRegister, err := symPlugin.Lookup("Register")
-			if err != nil {
-				panic(err)
-			}
-
-			registerFunc := symRegister.(func(ServerApiInterface))
-			registerFunc(serverAPI)
-
+			p.loadPlugin(path, serverAPI)
 		}
 
 		return nil
@@ -105,6 +85,38 @@ func (p *PluginRegister) RegisterPlugins() {
 
 	if err != nil {
 		p.logger.Error("Failed to walk plugin directory", zap.String("Directory", p.config.Directory), zap.Error(err))
+	}
+}
+
+func (p *PluginRegister) loadPlugin(path string, serverAPI *ServerAPI) {
+	p.logger.Debug("Attempting to load plugin at", zap.String("Path", path))
+
+	// Hash plugin file
+	_, err := hashPlugin(path)
+	if err != nil {
+		p.logger.Error("Failed to hash plugin file", zap.String("Path", path), zap.Error(err))
+		return
+	}
+
+	// Open plugin file
+	symPlugin, err := plugin.Open(path)
+	if err != nil {
+		p.logger.Error("Failed to open plugin file", zap.String("Path", path), zap.Error(err))
+		return
+	}
+
+	symRegister, err := symPlugin.Lookup("Register")
+	if err != nil {
+		p.logger.Error("Failed to lookup Register symbol", zap.String("Path", path), zap.Error(err))
+		return
+	}
+
+	registerFunc := symRegister.(func(ServerApiInterface))
+	registerFunc(serverAPI)
+
+	_, err = lookupSymbol[string](symPlugin, "ServiceName")
+	if err != nil {
+		p.logger.Error("Failed to look up plugin name symbol", zap.String("Path", path))
 	}
 }
 
@@ -124,13 +136,12 @@ func hashPlugin(path string) (string, error) {
 	}
 	defer file.Close()
 
-	hasher := sha256.New() //	hasher := sha256.New()
+	hasher := sha256.New()
 	if _, err := io.Copy(hasher, file); err != nil {
 		return "", err
 	}
 
 	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
-
 }
 
 func lookupSymbol[T any](plugin *plugin.Plugin, symbolName string) (*T, error) {
