@@ -84,8 +84,8 @@ func main() {
 	}
 
 	// Register plugins
-	pluginRegister := plugins.Init(pluginConfig, logger, dbConn, httpServer)
-	pluginRegister.Register()
+	pluginRegister := plugins.Init(pluginConfig, dbConn, logger, httpServer.Router)
+	pluginRegister.RegisterPlugins()
 
 	httpServer.ListenAndServe()
 }
