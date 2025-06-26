@@ -4,10 +4,12 @@ go 1.24.4
 
 replace github.com/gregmulvaney/forager => ../.
 
-require github.com/gregmulvaney/forager v0.0.1
+require (
+	github.com/a-h/templ v0.3.898
+	github.com/gregmulvaney/forager v0.0.1
+)
 
 require (
-	github.com/a-h/templ v0.3.898 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.8.0 // indirect
 	github.com/gofiber/fiber/v3 v3.0.0-beta.4 // indirect

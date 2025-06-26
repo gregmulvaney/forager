@@ -5,3 +5,7 @@ build:
 
 dev:
 	go build -buildmode=plugin -o ../tmp/plugins/${NAME}.so .
+
+.PHONY: sqlc
+sqlc:
+	sqlc generate -f sqlc/sqlc.yaml
