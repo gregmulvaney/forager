@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/compress"
 	"github.com/gofiber/fiber/v3/middleware/static"
+	"github.com/gregmulvaney/forager/pkg/plugins"
 	"github.com/gregmulvaney/forager/web"
 	"github.com/gregmulvaney/forager/web/pages"
 	"go.uber.org/zap"
@@ -20,9 +21,10 @@ type Config struct {
 }
 
 type Server struct {
-	config *Config
-	logger *zap.Logger
-	Router *fiber.App
+	config  *Config
+	logger  *zap.Logger
+	Router  *fiber.App
+	Plugins *plugins.PluginRegister
 }
 
 func Init(config *Config, logger *zap.Logger) *Server {

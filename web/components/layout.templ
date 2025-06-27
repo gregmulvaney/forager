@@ -18,8 +18,11 @@ templ Layout(title string) {
 		<body class="bg-background text-foreground w-full">
 			<div class="flex min-h-screen" x-data="{sidebarOpen: true}">
 				@sidebar()
-				<main class="ml-60">
-					{ children... }
+				<main class="ml-60 flex-1">
+					@Header()
+					<div class="py-4">
+						{ children... }
+					</div>
 				</main>
 			</div>
 		</body>
@@ -27,4 +30,10 @@ templ Layout(title string) {
             lucide.createIcons()
         </script>
 	</html>
+}
+
+templ Header() {
+	<div class="flex items-center h-16 border-b border-b-border w-full justify-center" x-data="{}">
+		<input class="px-4 py-2 bg-secondary w-1/2 mx-auto" type="text"/>
+	</div>
 }
