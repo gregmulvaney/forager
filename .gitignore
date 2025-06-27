@@ -1,0 +1,20 @@
+# Go output
+tmp
+bin
+
+# Nix output
+.direnv
+
+# Node outputs
+*node_modules
+
+# macOS junk
+*.DS_Store
+
+# SQL
+forager.sqlite3
+
+# Claude shit
+CLAUDE.md
+.claude/
+
