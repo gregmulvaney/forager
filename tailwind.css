@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
-@source 'web/../.';
+@source 'web/';
 
-
+@theme {
+    --color-muted: oklch(0.6819 0.0102 286.13);
+    --color-secondary: oklch(0.2011 0.0039 286.04);
+    --color-background: oklch(0.2238 0.0077 285.76);
+    --color-foreground: oklch(0.9289 0.0252 106.88);
+    --color-border: oklch(0.2431 0.0039 286.04)
+}

@@ -1,5 +1,9 @@
 package pages
 
+import "github.com/gregmulvaney/forager/web/components"
+
 templ Index() {
-	<div>Index</div>
+	@components.Layout("Forager") {
+		<div>Index</div>
+	}
 }

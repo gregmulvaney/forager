@@ -5,7 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gofiber/fiber/v3"
+	"github.com/gregmulvaney/forager/pkg/api/http"
+	"github.com/gregmulvaney/forager/pkg/db"
 	"github.com/gregmulvaney/forager/pkg/plugins"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -64,17 +65,33 @@ func main() {
 	stdLog := zap.RedirectStdLog(logger)
 	defer stdLog()
 
+	dbConn := db.Init(logger)
+
+	var httpConfig *http.Config
+	if err := viper.Unmarshal(&httpConfig); err != nil {
+		logger.Panic("Failed to unmarshall HTTP config", zap.Error(err))
+	}
+
+	httpServer := http.Init(httpConfig, logger, dbConn)
+
 	// Unmarshall Plugin config
 	var pluginConfig *plugins.Config
 	if err := viper.Unmarshal(&pluginConfig); err != nil {
-		logger.Panic("Faile to unmarshall plugins config", zap.Error(err))
+		logger.Panic("Failed to unmarshall plugins config", zap.Error(err))
 	}
 
 	// Register plugins
-	pluginRegister := plugins.Init(pluginConfig, logger, fiber.New())
+	pluginRegister := plugins.Init(pluginConfig, logger, httpServer.Router, dbConn)
 	pluginRegister.RegisterPlugins()
+
+	httpServer.Plugins = pluginRegister
+
+	httpServer.ListenAndServe()
 }
 
+// initZap initializes and configures a zap logger instance.
+// It accepts logLevel (debug, info, warn, error, fatal, panic) and logMode (console, json).
+// Returns a configured logger or an error if initialization fails.
 func initZap(logLevel string, logMode string) (*zap.Logger, error) {
 	level := zap.NewAtomicLevelAt(zapcore.InfoLevel)
 	// Switch log levels based on flags

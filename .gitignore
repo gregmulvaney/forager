@@ -13,6 +13,7 @@ bin
 
 # SQL
 forager.sqlite3
+.sqllsrc.json
 
 # Claude shit
 CLAUDE.md

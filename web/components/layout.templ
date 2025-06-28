@@ -1,0 +1,48 @@
+package components
+
+templ head(title string) {
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title }</title>
+		<link rel="stylesheet" href="/static/style.css"/>
+		<script src="https://unpkg.com/lucide@latest"></script>
+		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+	</head>
+}
+
+templ Layout(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		@head(title)
+		<body class="bg-background text-foreground w-full">
+			<div class="flex min-h-screen" x-data="{sidebarOpen: true}">
+				@sidebar()
+				<main class="ml-60 flex-1">
+					@Header()
+					<div class="py-4">
+						{ children... }
+					</div>
+				</main>
+			</div>
+		</body>
+		<script>
+    lucide.createIcons()
+</script>
+	</html>
+}
+
+templ Header() {
+	<div class="flex items-center h-16 border-b border-b-border w-full px-6" x-data="{}">
+		<button
+			type="button"
+			class="bg-secondary p-2 rounded-md text-muted text-sm flex border border-transparent items-center cursor-pointer hover:text-foreground hover:border-sky-500"
+		>
+			<span class="flex items-center gap-1 pr-2">
+				<i data-lucide="plus" class="h-5 w-5"></i>
+				<span>Add Link</span>
+			</span>
+			<i data-lucide="command" class="h-4 w-4"></i>
+		</button>
+	</div>
+}

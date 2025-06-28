@@ -1,0 +1,61 @@
+
+package components
+
+type NavItem struct {
+	icon        string
+	name        string
+	path        string
+	collapsible bool
+}
+
+var navItems = []NavItem{
+	{
+		icon:        "layout-dashboard",
+		name:        "Dashboard",
+		path:        "/",
+		collapsible: false,
+	},
+	{
+		icon:        "plug",
+		name:        "Services",
+		path:        "/services",
+		collapsible: true,
+	},
+	{
+		icon:        "settings",
+		name:        "Settings",
+		path:        "/settings",
+		collapsible: false,
+	},
+}
+
+templ sidebar() {
+	<aside
+		x-data="{open: true}"
+		class="bg-secondary fixed left-0 inset-y-0 transition-all duration-300 ease-in-out"
+		:class="sidebarOpen ? 'w-60' : 'w-18'"
+	>
+		<div class="px-2">
+			<div class="h-16 flex items-center gap-x-1 mb-8 px-2">
+				<img class="w-10 h-10" src="/static/Icon.png"/>
+				<span class="text-2xl font-medium">Forager</span>
+			</div>
+			<nav class="flex flex-col space-y-1">
+				for _, item := range navItems {
+					<a
+						class="px-4 py-2 hover:bg-sky-700 flex items-center gap-x-1 text-sm rounded-md"
+						href={ templ.URL(item.path) }
+					>
+						<i data-lucide={ item.icon } class="h-4 w-4"></i>
+						<span>{ item.name }</span>
+						if item.collapsible {
+							<div class="justify-end flex flex-1">
+								<i class="h-4 w-4" data-lucide="chevron-right"></i>
+							</div>
+						}
+					</a>
+				}
+			</nav>
+		</div>
+	</aside>
+}

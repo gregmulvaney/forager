@@ -5,7 +5,7 @@ build:
 	go build -o ./bin/forager ./cmd/forager/main.go
 
 tailwind:
-	tailwindcss -o ./web/static/style.css -i ./tailwind.css
+	tailwindcss -o ./web/static/style.css -i ./tailwind.css --minify
 
 .PHONY: sqlc
 sqlc:
