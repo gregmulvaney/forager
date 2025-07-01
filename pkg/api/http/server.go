@@ -5,7 +5,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/compress"
+	//"github.com/gofiber/fiber/v3/middleware/compress" FIXME: Enable this again once prod/dev implemented
 	"github.com/gofiber/fiber/v3/middleware/static"
 	"github.com/gregmulvaney/forager/pkg/db"
 	"github.com/gregmulvaney/forager/pkg/plugins"
@@ -41,12 +41,36 @@ func (s *Server) registerRoutes() {
 	s.Router.Get("/", func(ctx fiber.Ctx) error {
 		return Render(ctx, pages.Index())
 	})
+
+	s.Router.Get("/settings", func(ctx fiber.Ctx) error {
+		return Render(ctx, pages.Settings())
+	})
+
+	plugins := s.Router.Group("/plugins")
+
+	plugins.Post("/upload", func(ctx fiber.Ctx) error {
+		file, err := ctx.FormFile("plugin")
+		if err != nil {
+			return err
+		}
+
+		destination := fmt.Sprintf("%s/%s", s.Plugins.Config.Directory, file.Filename)
+		if err := ctx.SaveFile(file, destination); err != nil {
+			return err
+		}
+
+		return ctx.SendString("Uploaded")
+	})
+
 }
 
 // registerMiddleware configures HTTP middleware for the server
 func (s *Server) registerMiddleware() {
 	// Enable gzip compression for responses
-	s.Router.Use(compress.New(compress.ConfigDefault))
+	// NOTE: Disabled for air hot reloading
+	// FIXME: Add production/dev config flags
+
+	//s.Router.Use(compress.New(compress.ConfigDefault))
 }
 
 // ListenAndServe starts the HTTP server and begins listening for requests
@@ -67,10 +91,12 @@ func (s *Server) ListenAndServe() {
 // Init creates and initializes a new HTTP server instance
 func Init(config *Config, logger *zap.Logger, db *db.DB) *Server {
 	return &Server{
-		config: config,      // Store server configuration
-		logger: logger,      // Store logger instance
-		db:     db,          // Store database connection
-		Router: fiber.New(), // Initialize new Fiber app
+		config: config, // Store server configuration
+		logger: logger, // Store logger instance
+		db:     db,     // Store database connection
+		Router: fiber.New(fiber.Config{
+			BodyLimit: 50 * 1024 * 1024,
+		}), // Initialize new Fiber app
 	}
 }
 

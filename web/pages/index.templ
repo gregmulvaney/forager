@@ -4,6 +4,70 @@ import "github.com/gregmulvaney/forager/web/components"
 
 templ Index() {
 	@components.Layout("Forager") {
-		<div>Index</div>
+		<div class="flex items-center px-4 py-3 border-b border-border gap-4">
+			<button type="button">
+				<i data-lucide="play" class="h-6 w-6"></i>
+			</button>
+			<button type="button">
+				<i data-lucide="pause" class="h-6 w-6"></i>
+			</button>
+			<button type="button">
+				<i data-lucide="square" class="h-6 w-6"></i>
+			</button>
+		</div>
+		@components.Table() {
+			@components.TableHeader() {
+				@components.TableRow() {
+					@components.TableHead("w-10") {
+						#
+					}
+					@components.TableHead("border-l border-border") {
+						Name
+					}
+					@components.TableHead("border-l border-border") {
+						Host
+					}
+					@components.TableHead("border-l border-border") {
+						Size
+					}
+					@components.TableHead("border-l border-border") {
+						Speed
+					}
+					@components.TableHead("w-40 border-l border-border") {
+						Progress
+					}
+					@components.TableHead("border-l border-border") {
+						Status
+					}
+				}
+			}
+			@components.TableBody() {
+				@components.TableRow("cursor-pointer hover:bg-sky-700") {
+					@components.TableCell() {
+					}
+					@components.TableCell() {
+						example
+					}
+					@components.TableCell() {
+						example.com 
+					}
+					@components.TableCell() {
+						420.69 GiB
+					}
+					@components.TableCell() {
+						200 kbps
+					}
+					@components.TableCell() {
+						//	<span class="w-full h-6 bg-green-400 block rounded-md"></span>
+						<div class="w-full h-5 bg-secondary rounded-full overflow-hidden">
+							<div class="h-5 bg-emerald-500 w-[60%]"></div>
+						</div>
+					}
+					@components.TableCell() {
+						Downloading
+					}
+				}
+			}
+		}
 	}
 }

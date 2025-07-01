@@ -1,0 +1,48 @@
+package pages
+
+import "github.com/gregmulvaney/forager/web/components"
+
+templ Settings() {
+	@components.Layout("Settings | Forager") {
+		<div class="wrapper flex flex-col h-full">
+			<div class="h-16 items-center flex px-8 border-b border-border">
+				<h1 class="text-2xl font-medium">Settings</h1>
+			</div>
+			<div class="flex flex-1">
+				<div class="w-50 border-r border-border px-8 py-6">
+					<div class="flex flex-col">
+						<span class="text-muted text-sm flex items-center">
+							<i data-lucide="plug" class="h-4 w-4"></i>
+							<span>Plugins</span>
+						</span>
+						<ul class="pl-4">
+							<li>
+								<a href="#">Add plugins</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="flex-1 px-8 py-6">
+					<h2 class="text-3xl border-b border-border py-2">Plugins</h2>
+					<h3 class="text-2xl py-2">Add Plugin</h3>
+					<div class="pb-2">
+						Upload a .so plugin file
+					</div>
+					<div class="flex items-center bg-secondary border border-amber-400 py-2 text-yellow-300 px-4 my-4 rounded text-sm gap-4">
+						<i data-lucide="triangle-alert" class="h-10 w-10"></i>
+						<div>
+							<span class="font-bold block">Warning:</span>
+							<span>Only install plugins you from sources you trust. Plugin contents are not verified.</span>
+						</div>
+					</div>
+					<div>
+						<form action="/plugins/upload" method="post" enctype="multipart/form-data">
+							<input type="file" name="plugin" id="plugin" class="file:mr-4 file:px-4 file:py-2 file:bg-sky-700 file:cursor-pointer file:rounded-full" accept=".so"/>
+							<button type="submit" class="cursor-pointer bg-sky-700 px-4 py-2">Upload</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}

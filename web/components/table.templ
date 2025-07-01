@@ -1,0 +1,37 @@
+package components
+
+templ Table(className ...string) {
+	<table class={ "w-full text-sm", className }>
+		{ children... }
+	</table>
+}
+
+templ TableHeader(className ...string) {
+	<thead class={ className }>
+		{ children... }
+	</thead>
+}
+
+templ TableHead(className ...string) {
+	<th class={ "px-2 font-medium align-middle whitespace-nowrap text-left h-10",className }>
+		{ children... }
+	</th>
+}
+
+templ TableBody(className ...string) {
+	<tbody class={ className }>
+		{ children... }
+	</tbody>
+}
+
+templ TableRow(className ...string) {
+	<tr class={ "border-b border-border", className }>
+		{ children... }
+	</tr>
+}
+
+templ TableCell(className ...string) {
+	<td class={ "px-2 align-middle text-left whitespace-nowrap h-10",className }>
+		{ children... }
+	</td>
+}

@@ -69,7 +69,7 @@ type ServicePlugin struct {
 // PluginRegister manages the loading and registration of plugins.
 // It maintains references to all loaded plugins and their configurations.
 type PluginRegister struct {
-	config  *Config          // Plugin system configuration
+	Config  *Config          // Plugin system configuration
 	logger  *zap.Logger      // Logger for plugin operations
 	router  *fiber.App       // Main application router
 	db      *db.DB           // Database connection
@@ -79,7 +79,7 @@ type PluginRegister struct {
 // Init creates a new PluginRegister instance with the provided dependencies
 func Init(config *Config, logger *zap.Logger, router *fiber.App, db *db.DB) *PluginRegister {
 	return &PluginRegister{
-		config: config,
+		Config: config,
 		logger: logger,
 		router: router,
 		db:     db,
@@ -97,7 +97,7 @@ func (p *PluginRegister) RegisterPlugins() {
 		db:         p.db,
 	}
 
-	err := filepath.WalkDir(p.config.Directory, func(path string, d fs.DirEntry, err error) error {
+	err := filepath.WalkDir(p.Config.Directory, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -115,7 +115,7 @@ func (p *PluginRegister) RegisterPlugins() {
 	})
 
 	if err != nil {
-		p.logger.Error("Error walking plugin directory", zap.String("Directory", p.config.Directory), zap.Error(err))
+		p.logger.Error("Error walking plugin directory", zap.String("Directory", p.Config.Directory), zap.Error(err))
 	}
 }
 
