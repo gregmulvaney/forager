@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gregmulvaney/forager/pkg/api/http"
 	"github.com/gregmulvaney/forager/pkg/db"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -15,6 +16,8 @@ import (
 func main() {
 	// Define config options
 	fs := pflag.NewFlagSet("default", pflag.ContinueOnError)
+	// App environment config
+	fs.String("app-env", "development", "Dev or prod")
 	// Plugins config
 	fs.String("plugins-dir", "./plugins", "Directory where plugin files are stored")
 	// HTTP config
@@ -64,7 +67,18 @@ func main() {
 	defer stdLog()
 
 	// Initialize DB
-	_ = db.Init(logger)
+	dbConn := db.Init(logger)
+
+	// Umarshall http config
+	var httpConfig *http.Config
+	if err := viper.Unmarshal(httpConfig); err != nil {
+		logger.Panic("Failed to unmarshal HTTP config", zap.Error(err))
+	}
+
+	// Initialize HTTP server object
+	httpServer := http.Init(httpConfig, logger, dbConn)
+
+	httpServer.ListenAndServe()
 }
 
 func initZap(logLevel string, logMode string) (*zap.Logger, error) {
