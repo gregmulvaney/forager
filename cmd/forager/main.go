@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gregmulvaney/forager/pkg/db"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -61,6 +62,9 @@ func main() {
 	}
 	stdLog := zap.RedirectStdLog(logger)
 	defer stdLog()
+
+	// Initialize DB
+	_ = db.Init(logger)
 }
 
 func initZap(logLevel string, logMode string) (*zap.Logger, error) {
