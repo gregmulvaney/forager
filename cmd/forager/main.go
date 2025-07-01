@@ -7,6 +7,8 @@ import (
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func main() {
@@ -50,5 +52,58 @@ func main() {
 	// Replace all dashes with hyphens for environment variables
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
+
+	// Initialize zap logger
+	logger, err := initZap(viper.GetString("log-level"), viper.GetString("log-mode"))
+	defer logger.Sync()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %s", err)
+	}
+	stdLog := zap.RedirectStdLog(logger)
+	defer stdLog()
+}
+
+func initZap(logLevel string, logMode string) (*zap.Logger, error) {
+	level := zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	// Switch log levels based on flags
+	switch logLevel {
+	case "debug":
+		level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	case "info":
+		level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	case "warn":
+		level = zap.NewAtomicLevelAt(zapcore.WarnLevel)
+	case "error":
+		level = zap.NewAtomicLevelAt(zapcore.ErrorLevel)
+	case "fatal":
+		level = zap.NewAtomicLevelAt(zapcore.FatalLevel)
+	case "panic":
+		level = zap.NewAtomicLevelAt(zapcore.PanicLevel)
+	}
+
+	zapEncoderConfig := zapcore.EncoderConfig{
+		TimeKey:        "ts",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "msg",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+
+	config := zap.Config{
+		Level:            level,
+		Development:      false,
+		Encoding:         logMode,
+		EncoderConfig:    zapEncoderConfig,
+		OutputPaths:      []string{"stderr"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+
+	return config.Build()
 
 }
